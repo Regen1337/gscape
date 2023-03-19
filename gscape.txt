@@ -1,0 +1,9 @@
+"gscape"
+{
+	"base"		"base"
+	"title"		"gScape"
+	"maps"		"" // "^_gscape"
+	"category"	"other"
+	"menusystem"	"1"
+	"workshopid"	""
+}
