@@ -1,11 +1,3 @@
-// this file will be a shared glua file that will be a class for characters the player can control
-// the class will have default values for the character
-// the class will have functions for the character
-// the class will be able to return the player of the character
-// the class will save and load the characters data when the player leaves and joins the server
-// the class will have a function to create a new character
-// the class will have a function to delete a character
-
 gScape = gScape or {}
 gScape.config = gScape.config or {}
 gScape.core = gScape.core or {}
@@ -16,39 +8,59 @@ local PLAYER = FindMetaTable("Player")
 local character = {}
 character.name = "null"
 character.model = gScape.config.character.defaultModel
-character.inventory = {}
+character.inventory = {} -- TODO
+character.skills = {} -- TODO
 character.slot = 1 -- 1 = main, 2 = alt, etc
 character.mode = 1 -- 1 = normal, 2 = ironman, 3 = hardcore ironman
 character.level = 1
 character.xp = 0
 
 do
-    function PLAYER:getCharacter()
-        return self.character or {}
-    end
-
     function PLAYER:setCharacter(character)
         self.character = character
+        if !SERVER then return end
+        net.Start("netScape.character.update")
+            net.WriteTable(character)
+        net.Send(self)
+    end
+
+    function PLAYER:setCharacters(characters)
+        self.characters = characters
+        if !SERVER then return end
+        net.Start("netScape.characters.update")
+            net.WriteTable(characters)
+        net.Send(self)
+    end 
+
+    function PLAYER:setCharacterSlot(slot)
+        local character = self:getCharacter()
+        character:setSlot(slot)
+        local characters = self:getCharacters()
+        characters[slot] = character
+        self:setCharacters(characters)
+    end
+    
+    function PLAYER:getCharacter()
+        return self.character or {}
     end
 
     function PLAYER:getCharacters()
         return self.characters or {}
     end
 
-    function PLAYER:setCharacters(characters)
-        self.characters = characters
+    function PLAYER:getCharacterSlot(slot)
+        local characters = self:getCharacters()
+        for k, v in pairs(characters) do
+            if v:getSlot() == slot then
+                return v
+            end
+        end
+        return false
     end
 
     function PLAYER:saveCharacter()
         local character = self:getCharacter()
         file.Write("gScape/characters/" .. self:SteamID64() .. "/" .. character:getSlot() .. ".txt", util.TableToJSON(character))
-    end
-
-    function PLAYER:loadCharacter(slot)
-        local character = util.JSONToTable(file.Read("gScape/characters/" .. self:SteamID64() .. "/" .. slot .. ".txt", "DATA"))
-        character:setPlayer(self)
-        character = gScape.lib.inherit(character, gScape.core.character.default)
-        self:setCharacter(character)
     end
 
     function PLAYER:saveCharacters()
@@ -58,6 +70,13 @@ do
         end
     end
 
+    function PLAYER:loadCharacter(slot)
+        local character = util.JSONToTable(file.Read("gScape/characters/" .. self:SteamID64() .. "/" .. slot .. ".txt", "DATA"))
+        character:setPlayer(self)
+        character = gScape.lib.inherit(character, gScape.core.character.default)
+        self:setCharacterSlot(slot)
+    end
+
     function PLAYER:loadCharacters()
         local characters = {}
         local files, directories = file.Find("gScape/characters/" .. self:SteamID64() .. "/*", "DATA")
@@ -65,7 +84,7 @@ do
             local character = util.JSONToTable(file.Read("gScape/characters/" .. self:SteamID64() .. "/" .. v, "DATA"))
             character:setPlayer(self)
             character = gScape.lib.inherit(character, gScape.core.character.default)
-            table.insert(characters, character)
+            characters[character:getSlot()] = character
         end
         self:setCharacters(characters)
     end
@@ -108,6 +127,9 @@ do
 end
 
 do
+
+
+
     function character:getPlayer()
         return self.player
     end

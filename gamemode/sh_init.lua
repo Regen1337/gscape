@@ -10,7 +10,7 @@ gScape.config = {}
 gScape.lib = {}
 
 function gScape.lib.print(color, ...)
-    local color = color or color_white
+    color = color or color_white
     MsgC(color, "[λScape] ", color_white, ...)
     MsgC(color_white, "\n")
 end
