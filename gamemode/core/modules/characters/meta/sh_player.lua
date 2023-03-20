@@ -18,8 +18,8 @@ do -- player meta
     end
 
     function PLAYER:setCharacterSlot(character, slot)
-        character:setSlot(slot)
         local characters = self:getCharacters()
+        character.vars.slot = slot
         characters[slot] = character
         self:setCharacters(characters)
     end
