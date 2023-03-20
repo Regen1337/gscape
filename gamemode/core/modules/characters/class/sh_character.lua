@@ -6,7 +6,7 @@ gScape.core.character.vars = gScape.core.character.vars or {}
 
 local character = gScape.core.character.default or {}
 character.vars = {}
-character.slot = 1 -- 1 = main, 2 = alt, etc
+--character.slot = 1 -- 1 = main, 2 = alt, etc
 --character.player = nil
 --character.name = nil
 --character.model = gScape.config.character.defaultModel
@@ -15,6 +15,8 @@ character.slot = 1 -- 1 = main, 2 = alt, etc
 --character.mode = 1 -- 1 = normal, 2 = ironman, 3 = hardcore ironman
 --character.level = 1
 --character.xp = 0
+
+gScape.core.character.default = character
 
 do
     --[==[
@@ -29,7 +31,6 @@ do
     @param: data.isLocal - Whether or not to replicate the variable locally
     @return: void
     ]==]
-
     function gScape.core.character.newVariable(idx, data)
         gScape.core.character.vars[idx] = data
         character.vars[idx] = data.default
@@ -53,7 +54,7 @@ do
             elseif data.isLocal then
                 character["set" .. upperName] = function(self, value)
                     self.vars[idx] = value
-                    net.Start("netScape.character.vars.update")
+                    net.Start("netScape.character.vars.sync")
                         net.WriteUInt(self:getSlot(), 8)
                         net.WriteString(idx)
                         net.WriteType(value)
@@ -62,7 +63,7 @@ do
             else
                 character["set" .. upperName] = function(self, value)
                     self.vars[idx] = value
-                    net.Start("netScape.character.vars.update")
+                    net.Start("netScape.character.vars.sync")
                         net.WriteUInt(self:getSlot(), 8)
                         net.WriteString(idx)
                         net.WriteType(value)
@@ -82,6 +83,28 @@ do
         end
 
     end
-end
 
-gScape.core.character.default = character
+    --[==[
+    @desc: Creates a new character
+    @param: data - The data of the character
+    @param: data.player - The player of the character
+    @param: data.name - The name of the character
+    @param: data.model - The model of the character
+    @param: data.inventory - The inventory of the character
+    @param: data.skills - The skills of the character
+    @param: data.mode - The mode of the character
+    @param: data.level - The level of the character
+    @param: data.xp - The xp of the character
+    @return: void
+    ]==]
+    function gScape.core.character.create(data)
+        local char = {}
+        char = gScape.lib.inherit(char, gScape.core.character.default)
+
+        for i,v in next, data do
+            char.vars[i] = v
+        end
+
+        return char
+    end
+end
