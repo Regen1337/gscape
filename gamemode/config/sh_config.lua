@@ -6,9 +6,6 @@ do
     gScape.config.inventory = {}
 end
 
-// list all models in defaul sandbox model list
-
-
 do
     gScape.config.character.startingCoins = 1000
     gScape.config.character.maxCharacters = 5

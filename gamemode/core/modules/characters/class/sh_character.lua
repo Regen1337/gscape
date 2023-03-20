@@ -207,6 +207,7 @@ end
 
 do -- character meta
     function character:sync()
+    end
 
     function character:getPlayer()
         return self.player
