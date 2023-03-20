@@ -54,7 +54,7 @@ do
             elseif data.isLocal then
                 character["set" .. upperName] = function(self, value)
                     self.vars[idx] = value
-                    net.Start("netScape.character.vars.sync")
+                    net.Start("netScape.character.var.sync")
                         net.WriteEntity(self:getPlayer())
                         net.WriteUInt(self:getSlot(), 8)
                         net.WriteString(idx)
@@ -64,7 +64,7 @@ do
             else
                 character["set" .. upperName] = function(self, value)
                     self.vars[idx] = value
-                    net.Start("netScape.character.vars.sync")
+                    net.Start("netScape.character.var.sync")
                         net.WriteEntity(self:getPlayer())
                         net.WriteUInt(self:getSlot(), 8)
                         net.WriteString(idx)
@@ -90,6 +90,7 @@ do
     @desc: Creates a new character
     @param: data - The data of the character
     @param: data.player - The player of the character
+    @param: data.slot - The slot of the character
     @param: data.name - The name of the character
     @param: data.model - The model of the character
     @param: data.inventory - The inventory of the character

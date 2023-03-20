@@ -1,3 +1,4 @@
-util.AddNetworkString("netScape.character.sync")
-util.AddNetworkString("netScape.characters.sync")
+util.AddNetworkString("netScape.characters.vars.sync")
+
 util.AddNetworkString("netScape.character.vars.sync")
+util.AddNetworkString("netScape.character.var.sync")

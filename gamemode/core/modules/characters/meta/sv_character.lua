@@ -14,10 +14,11 @@ do -- character meta
                     data[i] = v
                 end
             end
-            // TODO: send data to player
             net.Start("netScape.character.vars.sync")
-                
-
+                net.WriteEntity(self.vars.player)
+                net.WriteUInt(character:getSlot(), 8)
+                net.WriteTable(data)
+            net.Send(self.vars.player)
         elseif receiver:IsPlayer() then
             local data = {}
             for i, v in pairs(self.vars) do
@@ -25,8 +26,11 @@ do -- character meta
                     data[i] = v
                 end
             end
-
-
+            net.Start("netScape.character.vars.sync")
+                net.WriteEntity(self.vars.player)
+                net.WriteUInt(character:getSlot(), 8)
+                net.WriteTable(data)
+            net.Send(receiver)
         end
     end
 end

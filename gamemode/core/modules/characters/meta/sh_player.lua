@@ -1,15 +1,21 @@
 local PLAYER = FindMetaTable("Player")
 
 do -- player meta
-    function PLAYER:setCharacter(character)
+    function PLAYER:setCharacter(vars)
+        local character = gScape.core.character.create(vars)
+
         self.character = character
         if !SERVER then return end
+        self.character:syncVars()
     end
 
     function PLAYER:setCharacters(characters)
+        for i,v in ipairs(characters) do
+            v = gScape.core.character.create(v.vars or {})
+        end
         self.characters = characters
-        if !SERVER then return end
-    end 
+        self:syncCharacters()
+    end
 
     function PLAYER:setCharacterSlot(character, slot)
         character:setSlot(slot)
@@ -17,9 +23,18 @@ do -- player meta
         characters[slot] = character
         self:setCharacters(characters)
     end
+
+    function PLAYER:syncCharacters()
+        if !SERVER then return end
+        local characters = self:getCharacters()
+        net.Start("netScape.characters.vars.sync")
+            net.WriteEntity(self)
+            net.WriteTable(characters)
+        net.Send(self)
+    end
     
     function PLAYER:getCharacter()
-        return self.character or {}
+        return self.character or false
     end
 
     function PLAYER:getCharacters()
@@ -38,6 +53,7 @@ do -- player meta
 
     function PLAYER:saveCharacter()
         local character = self:getCharacter()
+        if !character then return end
         file.Write("gScape/characters/" .. self:SteamID64() .. "/" .. character:getSlot() .. ".txt", util.TableToJSON(character))
     end
 
@@ -50,8 +66,6 @@ do -- player meta
 
     function PLAYER:loadCharacter(slot)
         local character = util.JSONToTable(file.Read("gScape/characters/" .. self:SteamID64() .. "/" .. slot .. ".txt", "DATA"))
-        character = gScape.lib.inherit(character, gScape.core.character.default)
-        character:setPlayer(self)
         self:setCharacterSlot(character, slot)
     end
 
@@ -60,8 +74,6 @@ do -- player meta
         local files, directories = file.Find("gScape/characters/" .. self:SteamID64() .. "/*", "DATA")
         for _, v in next, files do
             local character = util.JSONToTable(file.Read("gScape/characters/" .. self:SteamID64() .. "/" .. v, "DATA"))
-            character = gScape.lib.inherit(character, gScape.core.character.default)
-            character:setPlayer(self)
             characters[character:getSlot()] = character
         end
         self:setCharacters(characters)
