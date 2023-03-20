@@ -4,17 +4,11 @@ do -- player meta
     function PLAYER:setCharacter(character)
         self.character = character
         if !SERVER then return end
-        net.Start("netScape.character.update")
-            net.WriteTable(character)
-        net.Send(self)
     end
 
     function PLAYER:setCharacters(characters)
         self.characters = characters
         if !SERVER then return end
-        net.Start("netScape.characters.update")
-            net.WriteTable(characters)
-        net.Send(self)
     end 
 
     function PLAYER:setCharacterSlot(character, slot)
@@ -34,7 +28,7 @@ do -- player meta
 
     function PLAYER:getCharacterSlot(slot)
         local characters = self:getCharacters()
-        for k, v in pairs(characters) do
+        for k, v in ipairs(characters) do
             if v:getSlot() == slot then
                 return v
             end
@@ -49,7 +43,7 @@ do -- player meta
 
     function PLAYER:saveCharacters()
         local characters = self:getCharacters()
-        for k, v in pairs(characters) do
+        for _, v in ipairs(characters) do
             file.Write("gScape/characters/" .. self:SteamID64() .. "/" .. v:getSlot() .. ".txt", util.TableToJSON(v))
         end
     end
@@ -64,7 +58,7 @@ do -- player meta
     function PLAYER:loadCharacters()
         local characters = {}
         local files, directories = file.Find("gScape/characters/" .. self:SteamID64() .. "/*", "DATA")
-        for k, v in pairs(files) do
+        for _, v in next, files do
             local character = util.JSONToTable(file.Read("gScape/characters/" .. self:SteamID64() .. "/" .. v, "DATA"))
             character = gScape.lib.inherit(character, gScape.core.character.default)
             character:setPlayer(self)
@@ -84,7 +78,7 @@ do -- player meta
 
     function PLAYER:hasCharacterSlot(slot)
         local characters = self:getCharacters()
-        for k, v in pairs(characters) do
+        for _, v in ipairs(characters) do
             if v:getSlot() == slot then
                 return true
             end
