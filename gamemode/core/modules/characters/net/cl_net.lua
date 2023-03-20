@@ -5,7 +5,7 @@
     @param val The value of the variable
 ]==]
 net.Receive("netScape.character.vars.sync", function()
-    local receiver = net.ReadEntity()
+    local sender = net.ReadEntity()
     local id = net.ReadUInt(8)
     local idx = net.ReadString()
     local val = net.ReadType()

@@ -55,6 +55,7 @@ do
                 character["set" .. upperName] = function(self, value)
                     self.vars[idx] = value
                     net.Start("netScape.character.vars.sync")
+                        net.WriteEntity(self:getPlayer())
                         net.WriteUInt(self:getSlot(), 8)
                         net.WriteString(idx)
                         net.WriteType(value)
@@ -64,6 +65,7 @@ do
                 character["set" .. upperName] = function(self, value)
                     self.vars[idx] = value
                     net.Start("netScape.character.vars.sync")
+                        net.WriteEntity(self:getPlayer())
                         net.WriteUInt(self:getSlot(), 8)
                         net.WriteString(idx)
                         net.WriteType(value)
