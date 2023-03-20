@@ -18,22 +18,16 @@ character.slot = 1 -- 1 = main, 2 = alt, etc
 
 do
     --[==[
-        @param idx string
-        @param data table
-        @param data.default any
-            default value for the variable
-        @param data.alias string or table
-            if alias is a string, then it will be used as an alias for the variable
-            if alias is a table, then it will be used as a list of aliases for the variable
-        @param data.onGet function
-            override the default get function
-        @param data.onSet function
-            override the default set function, will not automatically replicate the variable
-        @param data.noReplication boolean
-            if noReplication is true, then the variable will not be replicated to the client
-        @param data.isLocal boolean
-            if isLocal is true, then the variable will only be replicated to the player who set it
-        @return void
+    @desc: Creates a new character variable
+    @param: idx - The index of the variable
+    @param: data - The data of the variable
+    @param: data.default - The default value of the variable
+    @param: data.alias - The alias of the variable
+    @param: data.onGet - The function to run when the variable is retrieved
+    @param: data.onSet - The function to run when the variable is set, if this is not set, it will be automatically networked
+    @param: data.noReplication - Whether or not to replicate the variable
+    @param: data.isLocal - Whether or not to replicate the variable locally
+    @return: void
     ]==]
 
     function gScape.core.character.newVariable(idx, data)

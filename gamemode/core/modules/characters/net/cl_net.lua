@@ -3,4 +3,5 @@ net.Receive("netScape.character.vars.update", function()
     local idx = net.ReadString()
     local val = net.ReadType()
     
+    
 end)
