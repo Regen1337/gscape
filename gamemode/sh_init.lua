@@ -9,6 +9,12 @@ gScape.core = {}
 gScape.config = {}
 gScape.lib = {}
 
+--[==[
+    @desc: prints a message to the console with a prefix
+    @param: color - the color of the prefix
+    @param: ... - the message to print
+    @return: void
+]==]
 function gScape.lib.print(color, ...)
     color = color or color_white
     MsgC(color, "[λScape] ", color_white, ...)

@@ -2,6 +2,13 @@ gScape = gScape or {}
 gScape.lib = gScape.lib or {}
 
 gScape.lib.files = {}
+
+--[==[
+    @desc: Includes a file based on the prefix of the file name.
+    @param: path - The path to the file.
+    @param: prefix - The prefix of the file name.
+    @return: void
+]==]
 gScape.lib.files.include = function(path, prefix)
     local color = Color(255, 215, 0)
     if SERVER then
@@ -27,6 +34,11 @@ gScape.lib.files.include = function(path, prefix)
     end
 end
 
+--[==[
+    @desc: Includes all files in a directory, recursively.
+    @param: path - The path to the directory.
+    @return: void
+]==]
 gScape.lib.files.includeDir = function(path)
     path = "gamemodes/gscape/" .. path
     local files, folders = file.Find(path ..  "*", "GAME")

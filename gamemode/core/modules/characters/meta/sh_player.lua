@@ -17,8 +17,7 @@ do -- player meta
         net.Send(self)
     end 
 
-    function PLAYER:setCharacterSlot(slot)
-        local character = self:getCharacter()
+    function PLAYER:setCharacterSlot(character, slot)
         character:setSlot(slot)
         local characters = self:getCharacters()
         characters[slot] = character
@@ -57,9 +56,9 @@ do -- player meta
 
     function PLAYER:loadCharacter(slot)
         local character = util.JSONToTable(file.Read("gScape/characters/" .. self:SteamID64() .. "/" .. slot .. ".txt", "DATA"))
-        character:setPlayer(self)
         character = gScape.lib.inherit(character, gScape.core.character.default)
-        self:setCharacterSlot(slot)
+        character:setPlayer(self)
+        self:setCharacterSlot(character, slot)
     end
 
     function PLAYER:loadCharacters()
@@ -67,8 +66,8 @@ do -- player meta
         local files, directories = file.Find("gScape/characters/" .. self:SteamID64() .. "/*", "DATA")
         for k, v in pairs(files) do
             local character = util.JSONToTable(file.Read("gScape/characters/" .. self:SteamID64() .. "/" .. v, "DATA"))
-            character:setPlayer(self)
             character = gScape.lib.inherit(character, gScape.core.character.default)
+            character:setPlayer(self)
             characters[character:getSlot()] = character
         end
         self:setCharacters(characters)

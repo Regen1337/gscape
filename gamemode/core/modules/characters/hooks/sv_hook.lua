@@ -1,4 +1,3 @@
-// hook when a player connects and load their character in gmod lua
 hook.Add("PlayerInitialSpawn", "hookScape.characters.load", function(ply)
     ply:loadCharacters()
 end)
