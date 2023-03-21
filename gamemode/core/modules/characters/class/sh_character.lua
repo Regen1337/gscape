@@ -6,23 +6,13 @@ gScape.core.character.vars = gScape.core.character.vars or {}
 
 local character = gScape.core.character.default or {}
 character.vars = {}
---character.slot = 1 -- 1 = main, 2 = alt, etc
---character.player = nil
---character.name = nil
---character.model = gScape.config.character.defaultModel
---character.inventory = {} -- TODO
---character.skills = {} -- TODO
---character.mode = 1 -- 1 = normal, 2 = ironman, 3 = hardcore ironman
---character.level = 1
---character.xp = 0
 
 gScape.core.character.default = character
-
 do
     --[==[
     @desc: Creates a new character variable
-    @param: idx - The index of the variable
     @param: data - The data of the variable
+    @param: data.name - The index of the variable
     @param: data.default - The default value of the variable
     @param: data.alias - The alias of the variable
     @param: data.onGet - The function to run when the variable is retrieved
@@ -31,16 +21,17 @@ do
     @param: data.isLocal - Whether or not to replicate the variable locally
     @return: void
     ]==]
-    function gScape.core.character.newVariable(idx, data)
-        gScape.core.character.vars[idx] = data
-        character.vars[idx] = data.default
-        local upperName, alias = string.upper(string.sub(idx, 1, 1)) .. string.sub(idx, 2), data.alias
+    function gScape.core.character.newVariable(data)
+        gScape.core.character.vars[data.name] = data
+        local upperName, alias = string.upper(string.sub(data.name, 1, 1)) .. string.sub(data.name, 2), data.alias
+        local character = gScape.core.character.default
+        character.vars[data.name] = data.default
 
         if data.onGet then
             character["get" .. upperName] = data.onGet
         else
             character["get" .. upperName] = function(self)
-                return self.vars[idx]
+                return self.vars[data.name]
             end
         end
         
@@ -49,25 +40,25 @@ do
                 character["set" .. upperName] = data.onSet
             elseif data.noReplication then
                 character["set" .. upperName] = function(self, value)
-                    self.vars[idx] = value
+                    self.vars[data.name] = value
                 end
             elseif data.isLocal then
                 character["set" .. upperName] = function(self, value)
-                    self.vars[idx] = value
+                    self.vars[data.name] = value
                     net.Start("netScape.character.var.sync")
                         net.WriteEntity(self:getPlayer())
                         net.WriteUInt(self:getSlot(), 8)
-                        net.WriteString(idx)
+                        net.WriteString(data.name)
                         net.WriteType(value)
                     net.Send(self:getPlayer())
                 end
             else
                 character["set" .. upperName] = function(self, value)
-                    self.vars[idx] = value
+                    self.vars[data.name] = value
                     net.Start("netScape.character.var.sync")
                         net.WriteEntity(self:getPlayer())
                         net.WriteUInt(self:getSlot(), 8)
-                        net.WriteString(idx)
+                        net.WriteString(data.name)
                         net.WriteType(value)
                     net.Broadcast()
                 end
@@ -84,6 +75,7 @@ do
             character["set" .. string.upper(string.sub(alias, 1, 1)) .. string.sub(alias, 2)] = character["set" .. upperName]
         end
 
+        gScape.core.character.default = character
     end
 
     --[==[
@@ -110,4 +102,52 @@ do
 
         return char
     end
+end
+
+do
+    gScape.core.character.newVariable{
+        name = "player",
+        default = nil,
+        alias = "ply",
+    }
+
+    gScape.core.character.newVariable{
+        name = "slot",
+        default = 1,
+    }
+
+    gScape.core.character.newVariable{
+        name = "mode",
+        default = 1,
+    }
+
+    gScape.core.character.newVariable{
+        name = "name",
+        default = "nil",
+    }
+
+    gScape.core.character.newVariable{
+        name = "model",
+        default = gScape.config.character.defaultModel,
+    }
+
+    gScape.core.character.newVariable{
+        name = "inventory",
+        default = {},
+    }
+
+    gScape.core.character.newVariable{
+        name = "skills",
+        default = {},
+    }
+
+    gScape.core.character.newVariable{
+        name = "level",
+        default = 1,
+    }
+
+    gScape.core.character.newVariable{
+        name = "xp",
+        default = 0,
+    }
 end

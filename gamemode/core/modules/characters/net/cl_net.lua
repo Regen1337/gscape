@@ -1,5 +1,5 @@
 --[==[
-    @param receiver The entity to receive the data
+    @param sender The entity who send the data
     @param id The character ID
     @param idx The index of the variable
     @param val The value of the variable
@@ -10,14 +10,14 @@ net.Receive("netScape.character.var.sync", function()
     local idx = net.ReadString()
     local val = net.ReadType()
     
-    local character = sender:getCharacterSlot(id) or gScape.core.character.default.vars
+    local character = sender:getCharacterSlot(id) or gScape.core.character.default
     character.vars[idx] = val
     sender:setCharacter(character.vars)
     sender:setCharacterSlot(id, character)
 end)
 
 --[==[
-    @param receiver The entity to receive the data
+    @param sender The entity who send the data
     @param id The character ID
     @param tbl The table of variables
 ]==]
@@ -31,7 +31,7 @@ net.Receive("netScape.character.vars.sync", function()
 end)
 
 --[==[
-    @param receiver The entity to receive the data
+    @param sender The entity who send the data
     @param tbl The table of variables
 ]==]
 net.Receive("netScape.characters.vars.sync", function()
