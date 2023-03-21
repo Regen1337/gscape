@@ -8,6 +8,5 @@ gScape.lib = gScape.lib or {}
     @return: table with metatable
 ]==]
 function gScape.lib.inherit( t, mt )
-    local meta = {__index = mt, __call = mt}
-    return setmetatable( t or {}, meta )
+    return setmetatable( t or {}, {__index = mt, __call = mt} )
 end

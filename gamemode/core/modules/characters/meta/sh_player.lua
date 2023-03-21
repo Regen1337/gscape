@@ -1,8 +1,16 @@
 local PLAYER = FindMetaTable("Player")
 
 do -- player meta
-    function PLAYER:setCharacter(vars)
-        local character = gScape.core.character.create(vars)
+    function PLAYER:setCharacter(vars, slot)
+        local characters = self:getCharacters()
+        local character = gScape.core.character.create(vars or {})
+        character.vars.player = self
+
+        if vars.slot then
+            character.vars.slot = slot
+            characters[slot] = character
+            self:setCharacters(characters)
+        end
 
         self.character = character
         if !SERVER then return end
@@ -12,16 +20,10 @@ do -- player meta
     function PLAYER:setCharacters(characters)
         for i,v in ipairs(characters) do
             v = gScape.core.character.create(v.vars or {})
+            v.vars.player = self
         end
         self.characters = characters
         self:syncCharacters()
-    end
-
-    function PLAYER:setCharacterSlot(character, slot)
-        local characters = self:getCharacters()
-        character.vars.slot = slot
-        characters[slot] = character
-        self:setCharacters(characters)
     end
 
     function PLAYER:syncCharacters()
@@ -42,8 +44,7 @@ do -- player meta
     end
 
     function PLAYER:getCharacterSlot(slot)
-        local characters = self:getCharacters()
-        for k, v in ipairs(characters) do
+        for k, v in ipairs(self:getCharacters()) do
             if v:getSlot() == slot then
                 return v
             end
@@ -66,7 +67,7 @@ do -- player meta
 
     function PLAYER:loadCharacter(slot)
         local character = util.JSONToTable(file.Read("gScape/characters/" .. self:SteamID64() .. "/" .. slot .. ".txt", "DATA"))
-        self:setCharacterSlot(character, slot)
+        self:setCharacter(character.vars, slot)
     end
 
     function PLAYER:loadCharacters()
