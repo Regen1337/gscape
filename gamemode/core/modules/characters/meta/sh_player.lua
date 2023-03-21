@@ -1,15 +1,14 @@
 local PLAYER = FindMetaTable("Player")
 
 do -- player meta
-    function PLAYER:setCharacter(vars, slot)
+    function PLAYER:setCharacter(vars, receiver)
         local characters = self:getCharacters()
         local character = gScape.core.character.create(vars or {})
         character.vars.player = self
 
         if vars.slot then
-            character.vars.slot = slot
-            characters[slot] = character
-            self:setCharacters(characters)
+            characters[vars.slot] = character
+            self:setCharacters(characters, receiver)
         end
 
         self.character = character
@@ -17,22 +16,52 @@ do -- player meta
         self.character:syncVars()
     end
 
-    function PLAYER:setCharacters(characters)
+    function PLAYER:setCharacters(characters, receiver)
         for i,v in ipairs(characters) do
             v = gScape.core.character.create(v.vars or {})
             v.vars.player = self
         end
         self.characters = characters
-        self:syncCharacters()
+        self:syncCharacters(receiver)
     end
 
-    function PLAYER:syncCharacters()
+    function PLAYER:syncCharacters(receiver)
         if !SERVER then return end
-        local characters = self:getCharacters()
-        net.Start("netScape.characters.vars.sync")
-            net.WriteEntity(self)
-            net.WriteTable(characters)
-        net.Send(self)
+        local characters = {}
+
+        for k, v in ipairs(self:getCharacters()) do
+            characters[k] = v
+        end
+
+        if !receiver then
+            for _, v in ipairs(player.GetAll()) do
+                self:syncCharacters(v)
+            end
+        elseif receiver == self then
+            for k, v in ipairs(characters) do
+                for k2, v2 in next, (v.vars) do
+                    if gScape.core.character.vars[k2] and gScape.core.character.vars[k2].noReplication then
+                        characters[k].vars[k2] = nil
+                    end
+                end
+            end
+            net.Start("netScape.characters.sync")
+                net.WriteEntity(self)
+                net.WriteTable(characters)
+            net.Send(self)
+        elseif receiver:IsPlayer() then
+            for k, v in ipairs(characters) do
+                for k2, v2 in next, (v.vars) do
+                    if gScape.core.character.vars[k2] and (gScape.core.character.vars[k2].noReplication or gScape.core.characters.vars[k2].isLocal) then
+                        characters[k].vars[k2] = nil
+                    end
+                end
+            end
+            net.Start("netScape.characters.sync")
+                net.WriteEntity(self)
+                net.WriteTable(characters)
+            net.Send(receiver)
+        end
     end
     
     function PLAYER:getCharacter()
@@ -67,7 +96,7 @@ do -- player meta
 
     function PLAYER:loadCharacter(slot)
         local character = util.JSONToTable(file.Read("gScape/characters/" .. self:SteamID64() .. "/" .. slot .. ".txt", "DATA"))
-        self:setCharacter(character.vars, slot)
+        self:setCharacter(character.vars, slot, self)
     end
 
     function PLAYER:loadCharacters()
@@ -77,7 +106,7 @@ do -- player meta
             local character = util.JSONToTable(file.Read("gScape/characters/" .. self:SteamID64() .. "/" .. v, "DATA"))
             characters[character:getSlot()] = character
         end
-        self:setCharacters(characters)
+        self:setCharacters(characters, self)
     end
 
     function PLAYER:hasCharacter()

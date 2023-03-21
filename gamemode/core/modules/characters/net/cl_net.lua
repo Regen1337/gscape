@@ -13,7 +13,7 @@ net.Receive("netScape.character.var.sync", function()
 
     local character = sender:getCharacterSlot(id) or gScape.core.character.default
     character.vars[idx] = val
-    sender:setCharacter(character.vars, id)
+    sender:setCharacter(character.vars, id, LocalPlayer())
 end)
 
 --[==[
@@ -27,17 +27,17 @@ net.Receive("netScape.character.vars.sync", function()
     local tbl = net.ReadTable()
     
     print(string.format("vars.sync Received character %s from %s", id, sender))
-    sender:setCharacter(tbl.vars or {}, id)
+    sender:setCharacter(tbl.vars or {}, id, LocalPlayer())
 end)
 
 --[==[
     @param sender The entity who send the data
     @param tbl The table of variables
 ]==]
-net.Receive("netScape.characters.vars.sync", function()
+net.Receive("netScape.characters.sync", function()
     local sender = net.ReadEntity()
     local tbl = net.ReadTable()
     print(string.format("Received characters from %s", sender))
     
-    sender:setCharacters(tbl)
+    sender:setCharacters(tbl, LocalPlayer())
 end)
