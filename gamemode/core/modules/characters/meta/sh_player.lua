@@ -49,7 +49,7 @@ do -- player meta
         elseif receiver == self then
             for k, v in ipairs(characters) do
                 for k2, v2 in next, (v.vars) do
-                    if gScape.core.character.default.vars[k2] and gScape.core.character.default.vars[k2].noReplication then
+                    if gScape.core.character.vars[k2] and gScape.core.character.vars[k2].noReplication then
                         characters[k].vars[k2] = nil
                     end
                 end
@@ -62,7 +62,7 @@ do -- player meta
         elseif receiver:IsPlayer() then
             for k, v in ipairs(characters) do
                 for k2, v2 in next, (v.vars) do
-                    if gScape.core.character.default.vars[k2] and (gScape.core.character.default.vars[k2].noReplication or gScape.core.characters.vars[k2].isLocal) then
+                    if gScape.core.character.vars[k2] and (gScape.core.character.vars[k2].noReplication or gScape.core.characters.vars[k2].isLocal) then
                         characters[k].vars[k2] = nil
                     end
                 end
