@@ -11,7 +11,7 @@ net.Receive("netScape.character.var.sync", function()
     local val = net.ReadType()
     print(string.format("var.sync Received character %s from %s", id, sender))
 
-    local character = sender:getCharacterSlot(id) or gScape.core.character.default
+    local character = sender:getCharacterSlot(id) or gScape.core.character.create({slot = id or 1})
     character.vars[idx] = val
     sender:setCharacter(character.vars, id, LocalPlayer())
 end)

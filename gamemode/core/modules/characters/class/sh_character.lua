@@ -2,12 +2,9 @@ gScape = gScape or {}
 gScape.config = gScape.config or {}
 gScape.core = gScape.core or {}
 gScape.core.character = gScape.core.character or {}
-gScape.core.character.vars = gScape.core.character.vars or {}
+gScape.core.character.default  = gScape.core.character.default or {}
+gScape.core.character.default.vars = gScape.core.character.default.vars or {}
 
-local character = gScape.core.character.default or {}
-character.vars = {}
-
-gScape.core.character.default = character
 do
     --[==[
     @desc: Creates a new character variable
@@ -22,7 +19,6 @@ do
     @return: void
     ]==]
     function gScape.core.character.newVariable(data)
-        gScape.core.character.vars[data.name] = data
         local upperName, alias = string.upper(string.sub(data.name, 1, 1)) .. string.sub(data.name, 2), data.alias
         local character = gScape.core.character.default
         character.vars[data.name] = data.default

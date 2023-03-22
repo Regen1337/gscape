@@ -10,7 +10,7 @@ do -- character meta
         elseif receiver == self.vars.player then
             local data = {}
             for i, v in pairs(self.vars) do
-                if gScape.core.character.vars[i] and !gScape.core.character.vars[i].noReplication then
+                if gScape.core.character.default.vars[i] and !gScape.core.character.default.vars[i].noReplication then
                     data[i] = v
                 end
             end
@@ -22,7 +22,7 @@ do -- character meta
         elseif receiver:IsPlayer() then
             local data = {}
             for i, v in pairs(self.vars) do
-                if gScape.core.character.vars[i] and !gScape.core.character.vars[i].isLocal and !gScape.core.character.vars[i].noReplication then
+                if gScape.core.character.default.vars[i] and !gScape.core.character.default.vars[i].isLocal and !gScape.core.character.default.vars[i].noReplication then
                     data[i] = v
                 end
             end
