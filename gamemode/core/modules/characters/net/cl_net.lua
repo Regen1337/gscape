@@ -25,9 +25,9 @@ net.Receive("netScape.character.vars.sync", function()
     local sender = net.ReadEntity()
     local id = net.ReadUInt(8)
     local tbl = net.ReadTable()
-    
     print(string.format("vars.sync Received character %s from %s", id, sender))
-    sender:setCharacter(tbl.vars or {}, id, LocalPlayer())
+
+    sender:setCharacter(tbl or {}, id, LocalPlayer())
 end)
 
 --[==[
@@ -39,5 +39,5 @@ net.Receive("netScape.characters.sync", function()
     local tbl = net.ReadTable()
     print(string.format("Received characters from %s", sender))
     
-    sender:setCharacters(tbl, LocalPlayer())
+    sender:setCharacters(tbl or {}, LocalPlayer())
 end)

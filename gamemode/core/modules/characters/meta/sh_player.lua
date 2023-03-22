@@ -8,16 +8,19 @@ do -- player meta
 
         if vars.slot then
             characters[vars.slot] = character
-            self:setCharacters(characters, receiver)
         end
 
         self.character = character
-        if !SERVER then return end
-        self.character:syncVars()
+
+        if SERVER then 
+            self.character:syncVars()
+        end
+        
+        self:setCharacters(characters, receiver)
     end
 
     function PLAYER:setCharacters(characters, receiver)
-        for i,v in ipairs(characters) do
+        for i,v in next, (characters) do
             v = gScape.core.character.create(v.vars or {})
             v.vars.player = self
         end
