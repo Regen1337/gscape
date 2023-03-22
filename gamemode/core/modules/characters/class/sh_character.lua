@@ -6,7 +6,6 @@ gScape.core.character.vars = gScape.core.character.vars or {}
 gScape.core.character.default  = gScape.core.character.default or {}
 gScape.core.character.default.vars = gScape.core.character.default.vars or{}
 
-gScape.core.character.default = char
 do
     --[==[
     @desc: Creates a new character variable
