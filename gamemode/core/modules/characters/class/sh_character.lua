@@ -100,7 +100,7 @@ do
     @return: void
     ]==]
     function gScape.core.character.create(data)
-        local char = gScape.lib.inherit({}, gScape.core.character.default)
+        local char = gScape.lib.inherit({vars = {}}, gScape.core.character.default)
 
         if data then
             for i,v in next, data do

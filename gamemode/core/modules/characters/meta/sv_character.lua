@@ -10,7 +10,7 @@ do -- character meta
             end
         elseif receiver == self:getPlayer() then
             local data = {}
-            for i, v in pairs(self.vars) do
+            for i, v in next, (self.vars) do
                 if gScape.core.character.vars[i] and !gScape.core.character.vars[i].noReplication then
                     data[i] = v
                 end
@@ -20,10 +20,10 @@ do -- character meta
                 net.WriteEntity(self:getPlayer())
                 net.WriteUInt(self:getSlot(), 8)
                 net.WriteTable(data)
-            net.Send(self.vars.player)
+            net.Send(self:getPlayer())
         elseif receiver:IsPlayer() then
             local data = {}
-            for i, v in pairs(self.vars) do
+            for i, v in next, (self.vars) do
                 if gScape.core.character.vars[i] and !gScape.core.character.vars[i].isLocal and !gScape.core.character.vars[i].noReplication then
                     data[i] = v
                 end
