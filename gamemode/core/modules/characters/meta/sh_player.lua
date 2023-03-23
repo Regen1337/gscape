@@ -5,15 +5,16 @@ do -- player meta
     function PLAYER:setCharacter(data, receiver)
         -- Create a new character based on the data passed to this function
         local character = gScape.core.character.create(data or {})
-        -- Add a reference to this player
-        character.vars.player = self
         -- Set the current character to this one
         self.character = character
         -- If this is a slot, add it to characters
+        character:setPlayer(self)
+        
         if data.slot then
-            self.characters = self.characters or {}
+            self.characters = self:getCharacters() or {}
             self.characters[data.slot] = character
         end
+
         -- If this is the server, sync the variables and set the characters
         if SERVER then
             print("[gScape] Syncing variables for player " .. self:Nick())
@@ -25,7 +26,7 @@ do -- player meta
                 print("[gScape] Synced variables for player " .. self:Nick())
             end
             print("[gScape] Setting characters for player " .. self:Nick())
-            success, err = pcall(self.setCharacters, self, self.characters or {}, receiver)
+            success, err = pcall(self.setCharacters, self, self:getCharacters() or {}, receiver)
             if not success then
                 print("[gScape] Failed to sync characters for player " .. self:Nick())
                 print("[gScape] Error: " .. err)
@@ -40,8 +41,8 @@ do -- player meta
         local characters = {}
         -- Loop through the data and create a new character for each one
         for k, v in pairs(data) do
-            local character = gScape.core.character.create(v)
-            character.vars.player = self
+            local character = gScape.core.character.create(v.vars)
+            character:setPlayer(self)
             characters[k] = character
         end
         -- Set the characters to the new table
@@ -120,7 +121,7 @@ do -- player meta
 
     function PLAYER:getCharacterSlot(slot)
         for k, v in ipairs(self:getCharacters()) do
-            if v.vars and v.vars.slot == slot then
+            if v:getSlot() == slot then
                 return v
             end
         end
