@@ -6,7 +6,7 @@ do -- player meta
     function PLAYER:setCharacter(data, receiver)
         -- Create a new character based on the data passed to this function
         local character = gScape.core.character.create(data or {})
-        -- Set the player of the character to this player
+        -- Set the player of the character to this player with noReplication set to true
         character:setPlayer(self, true)
         -- Set the current character to this one
         self.character = character
@@ -130,6 +130,7 @@ do -- player meta
         return false
     end
 
+    --TODO BEYOND
     function PLAYER:saveCharacter()
         local character = self:getCharacter()
         if !character then return end

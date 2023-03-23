@@ -106,7 +106,7 @@ do
             for i,v in next, data do
                 char.vars[i] = v
             end
-            gScape.lib.log(color, "Created new character: ", tostring(char), getmetatable(char))
+            gScape.lib.log(color, "Created new character: ", tostring(char), " metatable: ", getmetatable(char))
         else
             gScape.lib.log(color, "ERROR: No data provided to create character.")
         end
