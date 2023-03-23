@@ -3,7 +3,7 @@ local character = gScape.core.character.default or {}
 do -- character meta
     function character:syncVars(receiver)
         if receiver == nil then
-            local players = player.GetAll() 
+            local players = player.GetAll()
             for i,v in next, players do
                 self:syncVars(v)
             end
@@ -14,6 +14,7 @@ do -- character meta
                     data[i] = v
                 end
             end
+            print("Sending character data to player " .. receiver:Nick() .. "...")
             net.Start("netScape.character.vars.sync")
                 net.WriteEntity(self.vars.player)
                 net.WriteUInt(character:getSlot(), 8)
@@ -26,6 +27,7 @@ do -- character meta
                     data[i] = v
                 end
             end
+            print("Sending character data to player " .. receiver:Nick() .. "...")
             net.Start("netScape.character.vars.sync")
                 net.WriteEntity(self.vars.player)
                 net.WriteUInt(character:getSlot(), 8)

@@ -2,51 +2,51 @@ local PLAYER = FindMetaTable("Player")
 
 do -- player meta
     -- only send all characters to the owner of the character; TODO
-    function PLAYER:setCharacter(vars, receiver)
-        local character = gScape.core.character.create(vars or {})
-        for i,v in next, gScape.core.character.default.vars do print(1,i,v) end
+    function PLAYER:setCharacter(data, receiver)
+        -- Create a new character based on the data passed to this function
+        local character = gScape.core.character.create(data or {})
+        -- Add a reference to this player
         character.vars.player = self
-        for i,v in next, gScape.core.character.default.vars do print(2,i,v) end
-
+        -- Set the current character to this one
         self.character = character
-        print("set character to  " .. tostring(character), getmetatable(character))
-
-        if vars.slot then
+        -- If this is a slot, add it to characters
+        if data.slot then
             self.characters = self.characters or {}
---            for i,v in next, self.characters do print(i, v:getSlot()) end
-            self.characters[vars.slot] = character
-            print("set character slot " .. vars.slot)
+            self.characters[data.slot] = character
         end
-
+        -- If this is the server, sync the variables and set the characters
         if SERVER then
-            self.character:syncVars()
-            self:setCharacters(self.characters, receiver)
+            print("[gScape] Syncing variables for player " .. self:Nick())
+            local success, err = pcall(character.syncVars, character)
+            if not success then
+                print("[gScape] Failed to sync variables for player " .. self:Nick())
+                print("[gScape] Error: " .. err)
+            end
+            print("[gScape] Setting characters for player " .. self:Nick())
+            success, err = pcall(self.setCharacters, self, self.characters, receiver)
+            if not success then
+                print("[gScape] Failed to set characters for player " .. self:Nick())
+                print("[gScape] Error: " .. err)
+            end
         end
-    end
-
-    function PLAYER:setCharacters(characters, receiver)
-        for i,v in next, (characters) do
-            v = gScape.core.character.create(v.vars or {})
-            print("slot ", v.vars and v.vars.slot)
-            v.vars.player = self
-        end
-        self.characters = characters
-        self:syncCharacters(receiver)
     end
 
     function PLAYER:syncCharacters(receiver)
         if !SERVER then return end
-        local characters = {}
 
+        local characters = {}
         for k, v in ipairs(self:getCharacters()) do
             characters[k] = v
         end
 
         if !receiver then
+            -- loop through all players and send them their characters
             for _, v in ipairs(player.GetAll()) do
+                print("Sending characters to "..v:Nick())
                 self:syncCharacters(v)
             end
         elseif receiver == self then
+            -- loop through all characters and remove any variables marked as "noReplication"
             for k, v in ipairs(characters) do
                 for k2, v2 in next, (v.vars) do
                     if gScape.core.character.vars[k2] and gScape.core.character.vars[k2].noReplication then
@@ -54,23 +54,31 @@ do -- player meta
                     end
                 end
             end
-            for i,v in next, characters do print(getmetatable(v)) end
+
+            -- send to the player
+            print("Sending characters to "..self:Nick())
             net.Start("netScape.characters.sync")
                 net.WriteEntity(self)
                 net.WriteTable(characters)
             net.Send(self)
         elseif receiver:IsPlayer() then
+            -- loop through all characters and remove any variables marked as "noReplication" or "isLocal"
             for k, v in ipairs(characters) do
                 for k2, v2 in next, (v.vars) do
-                    if gScape.core.character.vars[k2] and (gScape.core.character.vars[k2].noReplication or gScape.core.characters.vars[k2].isLocal) then
+                    if gScape.core.character.vars[k2] and (gScape.core.character.vars[k2].noReplication or gScape.core.character.vars[k2].isLocal) then
                         characters[k].vars[k2] = nil
                     end
                 end
             end
+
+            -- send to the player
+            print("Sending characters to "..receiver:Nick())
             net.Start("netScape.characters.sync")
                 net.WriteEntity(self)
                 net.WriteTable(characters)
             net.Send(receiver)
+        else
+            error("Invalid receiver for syncCharacters: "..tostring(receiver))
         end
     end
     

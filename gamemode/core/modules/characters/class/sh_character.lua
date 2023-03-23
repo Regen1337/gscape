@@ -22,13 +22,16 @@ do
     function gScape.core.character.newVariable(data)
         local upperName, alias = string.upper(string.sub(data.name, 1, 1)) .. string.sub(data.name, 2), data.alias
         local character = gScape.core.character.default
+        print("Creating new character variable: " .. data.name)
         character.vars[data.name] = data.default
+        print("Setting default value of " .. data.name .. " to " .. tostring(data.default))
         gScape.core.character.vars[data.name] = data
 
         if data.onGet then
             character["get" .. upperName] = data.onGet
         else
             character["get" .. upperName] = function(self)
+                print("getting " .. data.name)
                 return self.vars[data.name]
             end
         end
@@ -39,10 +42,12 @@ do
             elseif data.noReplication then
                 character["set" .. upperName] = function(self, value)
                     self.vars[data.name] = value
+                    print("Setting " .. data.name .. " to " .. value)
                 end
             elseif data.isLocal then
                 character["set" .. upperName] = function(self, value)
                     self.vars[data.name] = value
+                    print("Setting " .. data.name .. " to " .. value)
                     net.Start("netScape.character.var.sync")
                         net.WriteEntity(self:getPlayer())
                         net.WriteUInt(self:getSlot(), 8)
@@ -53,6 +58,7 @@ do
             else
                 character["set" .. upperName] = function(self, value)
                     self.vars[data.name] = value
+                    print("Setting " .. data.name .. " to " .. value)
                     net.Start("netScape.character.var.sync")
                         net.WriteEntity(self:getPlayer())
                         net.WriteUInt(self:getSlot(), 8)
@@ -94,8 +100,13 @@ do
         local char = {}
         char = gScape.lib.inherit(char, gScape.core.character.default)
 
-        for i,v in next, data do
-            char.vars[i] = v
+        if data then
+            for i,v in next, data do
+                char.vars[i] = v
+            end
+            print("INFO: Character created with data: ", tostring(data))
+        else
+            print("ERROR: No data provided to create character.")
         end
 
         return char
