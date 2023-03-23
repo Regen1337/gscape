@@ -21,12 +21,40 @@ do -- player meta
             if not success then
                 print("[gScape] Failed to sync variables for player " .. self:Nick())
                 print("[gScape] Error: " .. err)
+            else
+                print("[gScape] Synced variables for player " .. self:Nick())
             end
             print("[gScape] Setting characters for player " .. self:Nick())
-            success, err = pcall(self.setCharacters, self, self.characters, receiver)
+            success, err = pcall(self.setCharacters, self, self.characters or {}, receiver)
             if not success then
-                print("[gScape] Failed to set characters for player " .. self:Nick())
+                print("[gScape] Failed to sync characters for player " .. self:Nick())
                 print("[gScape] Error: " .. err)
+            else
+                print("[gScape] Synced characters for player " .. self:Nick())
+            end
+        end
+    end
+
+    function PLAYER:setCharacters(data, receiver)
+        -- Create a new table of characters
+        local characters = {}
+        -- Loop through the data and create a new character for each one
+        for k, v in pairs(data) do
+            local character = gScape.core.character.create(v)
+            character.vars.player = self
+            characters[k] = character
+        end
+        -- Set the characters to the new table
+        self.characters = characters
+        -- If this is the server, sync the characters
+        if SERVER then
+            print("[gScape] Syncing characters for player " .. self:Nick())
+            local success, err = pcall(self.syncCharacters, self, receiver)
+            if not success then
+                print("[gScape] Failed to sync characters for player " .. self:Nick())
+                print("[gScape] Error: " .. err)
+            else
+                print("[gScape] Synced characters for player " .. self:Nick())
             end
         end
     end

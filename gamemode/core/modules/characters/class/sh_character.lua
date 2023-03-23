@@ -97,14 +97,13 @@ do
     @return: void
     ]==]
     function gScape.core.character.create(data)
-        local char = {}
-        char = gScape.lib.inherit(char, gScape.core.character.default)
+        local char = gScape.lib.inherit({}, gScape.core.character.default)
 
         if data then
             for i,v in next, data do
                 char.vars[i] = v
             end
-            print("INFO: Character created with data: ", tostring(data))
+            print("Created new character: ", tostring(char), getmetatable(char))
         else
             print("ERROR: No data provided to create character.")
         end
