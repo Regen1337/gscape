@@ -14,15 +14,15 @@ net.Receive("netScape.character.var.sync", function()
     local idx = net.ReadString()
     -- Get the variable value
     local val = net.ReadType()
-    print(string.format("var.sync Received character %s from %s", id, sender))
+    print(string.format("var.sync Received character %s from %s", id, tostring(sender)))
 
     -- Create a new character if it doesn't exist or get the existing character
     local character = sender:getCharacterSlot(id) or gScape.core.character.create({slot = id or 1})
-    print(string.format("var.sync Character %s received variable %s with value %s", id, idx, val))
+    print(string.format("var.sync Character %s received variable %s with value %s", id, idx, tostring(val)))
     -- Update the variable value
     character.vars[idx] = val
-    -- Send the updated character back to the server
-    sender:setCharacter(character.vars, id, LocalPlayer())
+    -- Update the character client-side
+    sender:setCharacter(character.vars, LocalPlayer())
 end)
 
 --[==[
@@ -45,17 +45,17 @@ local function receiveCharacterVarsSync()
 
     -- Check to see if the character table is valid and the ID is valid
     if (not tbl or not id) then
-        print(string.format("vars.sync Failed to receive character %s from %s", id, sender))
+        print(string.format("vars.sync Failed to receive character %s from %s", id, tostring(sender)))
         return
     end
 
     -- Print out to the console that the character table was received
-    print(string.format("vars.sync Received character %s from %s", id, sender))
+    print(string.format("vars.sync Received character %s from %s", id, tostring(sender)))
     print("vars.sync Received character table:")
     PrintTable(tbl)
 
     -- Set the character table on the sender's character data
-    sender:setCharacter(tbl, id, LocalPlayer())
+    sender:setCharacter(tbl, LocalPlayer())
 end
 
 net.Receive("netScape.character.vars.sync", receiveCharacterVarsSync)
@@ -68,7 +68,7 @@ local function receiveCharacters()
     local sender = net.ReadEntity()
     local characters = net.ReadTable()
     
-    print("Received characters from " .. sender)
+    print("Received characters from " .. tostring(sender))
     
     sender:setCharacters(characters or {}, LocalPlayer())
     

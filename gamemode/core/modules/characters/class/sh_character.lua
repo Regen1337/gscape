@@ -47,7 +47,7 @@ do
             elseif data.isLocal then
                 character["set" .. upperName] = function(self, value)
                     self.vars[data.name] = value
-                    print("Setting " .. data.name .. " to " .. value)
+                    print("Setting " .. data.name .. " to " .. tostring(value))
                     net.Start("netScape.character.var.sync")
                         net.WriteEntity(self:getPlayer())
                         net.WriteUInt(self:getSlot(), 8)
@@ -58,7 +58,7 @@ do
             else
                 character["set" .. upperName] = function(self, value)
                     self.vars[data.name] = value
-                    print("Setting " .. data.name .. " to " .. value)
+                    print("Setting " .. data.name .. " to " .. tostring(value))
                     net.Start("netScape.character.var.sync")
                         net.WriteEntity(self:getPlayer())
                         net.WriteUInt(self:getSlot(), 8)
