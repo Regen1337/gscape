@@ -15,21 +15,21 @@ gScape.lib.files.include = function(path, prefix)
         if prefix == "sh_" then
             AddCSLuaFile(path)
             include(path)
-            gScape.lib.print(color, "Included " .. path .. " on server and client.")
+            gScape.lib.log(color, "Included " .. path .. " on server and client.")
         elseif prefix == "sv_" then
             include(path)
-            gScape.lib.print(color, "Included " .. path .. " on server.")
+            gScape.lib.log(color, "Included " .. path .. " on server.")
         elseif prefix == "cl_" then
             AddCSLuaFile(path)
-            gScape.lib.print(color, "Included " .. path .. " on client.")
+            gScape.lib.log(color, "Included " .. path .. " on client.")
         end
     elseif CLIENT then
         if prefix == "sh_" then
             include(path)
-            gScape.lib.print(color, "Included " .. path .. " on client.")
+            gScape.lib.log(color, "Included " .. path .. " on client.")
         elseif prefix == "cl_" then
             include(path)
-            gScape.lib.print(color, "Included " .. path .. " on client.")
+            gScape.lib.log(color, "Included " .. path .. " on client.")
         end
     end
 end

@@ -15,7 +15,7 @@ gScape.lib = {}
     @param: ... - the message to print
     @return: void
 ]==]
-function gScape.lib.print(color, ...)
+function gScape.lib.log(color, ...)
     color = color or color_white
     MsgC(color, "[λScape] ", color_white, ...)
     MsgC(color_white, "\n")

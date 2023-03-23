@@ -1,15 +1,17 @@
 local PLAYER = FindMetaTable("Player")
+local color = Color(255, 100, 100)
 
 do -- player meta
     -- only send all characters to the owner of the character; TODO
     function PLAYER:setCharacter(data, receiver)
         -- Create a new character based on the data passed to this function
         local character = gScape.core.character.create(data or {})
+        -- Set the player of the character to this player
+        character:setPlayer(self, true)
         -- Set the current character to this one
         self.character = character
+
         -- If this is a slot, add it to characters
-        character:setPlayer(self)
-        
         if data.slot then
             self.characters = self:getCharacters() or {}
             self.characters[data.slot] = character
@@ -17,21 +19,21 @@ do -- player meta
 
         -- If this is the server, sync the variables and set the characters
         if SERVER then
-            print("[gScape] Syncing variables for player " .. self:Nick())
+            gScape.lib.log(color, "[gScape] Syncing variables for player " .. self:Nick())
             local success, err = pcall(character.syncVars, character)
             if not success then
-                print("[gScape] Failed to sync variables for player " .. self:Nick())
-                print("[gScape] Error: " .. err)
+                gScape.lib.log(color, "[gScape] Failed to sync variables for player " .. self:Nick())
+                gScape.lib.log(color, "[gScape] Error: " .. err)
             else
-                print("[gScape] Synced variables for player " .. self:Nick())
+                gScape.lib.log(color, "[gScape] Synced variables for player " .. self:Nick())
             end
-            print("[gScape] Setting characters for player " .. self:Nick())
+            gScape.lib.log(color, "[gScape] Syncing characters for player " .. self:Nick())
             success, err = pcall(self.setCharacters, self, self:getCharacters() or {}, receiver)
             if not success then
-                print("[gScape] Failed to sync characters for player " .. self:Nick())
-                print("[gScape] Error: " .. err)
+                gScape.lib.log(color, "[gScape] Failed to sync characters for player " .. self:Nick())
+                gScape.lib.log(color, "[gScape] Error: " .. err)
             else
-                print("[gScape] Synced characters for player " .. self:Nick())
+                gScape.lib.log(color, "[gScape] [setChar] Synced characters for player " .. self:Nick())
             end
         end
     end
@@ -41,21 +43,21 @@ do -- player meta
         local characters = {}
         -- Loop through the data and create a new character for each one
         for k, v in pairs(data) do
-            local character = gScape.core.character.create(v.vars)
-            character:setPlayer(self)
+            local character = gScape.core.character.create(v.vars or {})
+            character:setPlayer(self, true)
             characters[k] = character
         end
         -- Set the characters to the new table
         self.characters = characters
         -- If this is the server, sync the characters
         if SERVER then
-            print("[gScape] Syncing characters for player " .. self:Nick())
+            gScape.lib.log(color, "[gScape] Syncing characters for player " .. self:Nick())
             local success, err = pcall(self.syncCharacters, self, receiver)
             if not success then
-                print("[gScape] Failed to sync characters for player " .. self:Nick())
-                print("[gScape] Error: " .. err)
+                gScape.lib.log(color, "[gScape] Failed to sync characters for player " .. self:Nick())
+                gScape.lib.log(color, "[gScape] Error: " .. err)
             else
-                print("[gScape] Synced characters for player " .. self:Nick())
+                gScape.lib.log(color, "[gScape] [setChars] Synced characters for player " .. self:Nick())
             end
         end
     end
@@ -71,7 +73,7 @@ do -- player meta
         if !receiver then
             -- loop through all players and send them their characters
             for _, v in ipairs(player.GetAll()) do
-                print("Sending characters to "..v:Nick())
+                gScape.lib.log(color, "Sending characters to " .. v:Nick())
                 self:syncCharacters(v)
             end
         elseif receiver == self then
@@ -85,7 +87,7 @@ do -- player meta
             end
 
             -- send to the player
-            print("Sending characters to "..self:Nick())
+            gScape.lib.log(color, "Sending characters to "..self:Nick())
             net.Start("netScape.characters.sync")
                 net.WriteEntity(self)
                 net.WriteTable(characters)
@@ -101,7 +103,7 @@ do -- player meta
             end
 
             -- send to the player
-            print("Sending characters to "..receiver:Nick())
+            gScape.lib.log(color, "Sending characters to "..receiver:Nick())
             net.Start("netScape.characters.sync")
                 net.WriteEntity(self)
                 net.WriteTable(characters)

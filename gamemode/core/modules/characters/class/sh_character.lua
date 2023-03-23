@@ -5,6 +5,7 @@ gScape.core.character = gScape.core.character or {}
 gScape.core.character.vars = gScape.core.character.vars or {}
 gScape.core.character.default  = gScape.core.character.default or {}
 gScape.core.character.default.vars = gScape.core.character.default.vars or{}
+local color = Color(100, 255, 170)
 
 do
     --[==[
@@ -22,16 +23,16 @@ do
     function gScape.core.character.newVariable(data)
         local upperName, alias = string.upper(string.sub(data.name, 1, 1)) .. string.sub(data.name, 2), data.alias
         local character = gScape.core.character.default
-        print("Creating new character variable: " .. data.name)
+        gScape.lib.log(color, "Creating new character variable: " .. data.name)
         character.vars[data.name] = data.default
-        print("Setting default value of " .. data.name .. " to " .. tostring(data.default))
+        gScape.lib.log(color, "Setting default value of " .. data.name .. " to " .. tostring(data.default))
         gScape.core.character.vars[data.name] = data
 
         if data.onGet then
             character["get" .. upperName] = data.onGet
         else
             character["get" .. upperName] = function(self)
-                print("getting " .. data.name)
+                gScape.lib.log(color, "getting " .. data.name)
                 return self.vars[data.name]
             end
         end
@@ -42,12 +43,13 @@ do
             elseif data.noReplication then
                 character["set" .. upperName] = function(self, value)
                     self.vars[data.name] = value
-                    print("Setting " .. data.name .. " to " .. value)
+                    gScape.lib.log(color, "Setting " .. data.name .. " to " .. value)
                 end
             elseif data.isLocal then
-                character["set" .. upperName] = function(self, value)
+                character["set" .. upperName] = function(self, value, noReplication)
                     self.vars[data.name] = value
-                    print("Setting " .. data.name .. " to " .. tostring(value))
+                    gScape.lib.log(color, "Setting " .. data.name .. " to " .. tostring(value))
+                    if noReplication then return end
                     net.Start("netScape.character.var.sync")
                         net.WriteEntity(self:getPlayer())
                         net.WriteUInt(self:getSlot(), 8)
@@ -56,9 +58,10 @@ do
                     net.Send(self:getPlayer())
                 end
             else
-                character["set" .. upperName] = function(self, value)
+                character["set" .. upperName] = function(self, value, noReplication)
                     self.vars[data.name] = value
-                    print("Setting " .. data.name .. " to " .. tostring(value))
+                    gScape.lib.log(color, "Setting " .. data.name .. " to " .. tostring(value))
+                    if noReplication then return end
                     net.Start("netScape.character.var.sync")
                         net.WriteEntity(self:getPlayer())
                         net.WriteUInt(self:getSlot(), 8)
@@ -103,9 +106,9 @@ do
             for i,v in next, data do
                 char.vars[i] = v
             end
-            print("Created new character: ", tostring(char), getmetatable(char))
+            gScape.lib.log(color, "Created new character: ", tostring(char), getmetatable(char))
         else
-            print("ERROR: No data provided to create character.")
+            gScape.lib.log(color, "ERROR: No data provided to create character.")
         end
 
         return char

@@ -1,4 +1,5 @@
 local character = gScape.core.character.default or {}
+local color = Color(255, 100, 100)
 
 do -- character meta
     function character:syncVars(receiver)
@@ -7,17 +8,17 @@ do -- character meta
             for i,v in next, players do
                 self:syncVars(v)
             end
-        elseif receiver == self.vars.player then
+        elseif receiver == self:getPlayer() then
             local data = {}
             for i, v in pairs(self.vars) do
                 if gScape.core.character.vars[i] and !gScape.core.character.vars[i].noReplication then
                     data[i] = v
                 end
             end
-            print("Sending character data to player " .. receiver:Nick() .. "...")
+            gScape.lib.log(color, "Sending character data to player " .. receiver:Nick() .. "...")
             net.Start("netScape.character.vars.sync")
-                net.WriteEntity(self.vars.player)
-                net.WriteUInt(character:getSlot(), 8)
+                net.WriteEntity(self:getPlayer())
+                net.WriteUInt(self:getSlot(), 8)
                 net.WriteTable(data)
             net.Send(self.vars.player)
         elseif receiver:IsPlayer() then
@@ -27,10 +28,10 @@ do -- character meta
                     data[i] = v
                 end
             end
-            print("Sending character data to player " .. receiver:Nick() .. "...")
+            gScape.lib.log(color, "Sending character data to player " .. receiver:Nick() .. "...")
             net.Start("netScape.character.vars.sync")
-                net.WriteEntity(self.vars.player)
-                net.WriteUInt(character:getSlot(), 8)
+                net.WriteEntity(self:getPlayer())
+                net.WriteUInt(self:getSlot(), 8)
                 net.WriteTable(data)
             net.Send(receiver)
         end

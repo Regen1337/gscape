@@ -1,3 +1,4 @@
+local color = Color(255, 100, 100)
 --[==[
     @param sender The entity who send the data
     @param id The character ID
@@ -14,11 +15,11 @@ net.Receive("netScape.character.var.sync", function()
     local idx = net.ReadString()
     -- Get the variable value
     local val = net.ReadType()
-    print(string.format("var.sync Received character %s from %s", id, tostring(sender)))
+    gScape.lib.log(color, string.format("var.sync Received character %s from %s", id, tostring(sender)))
 
     -- Create a new character if it doesn't exist or get the existing character
     local character = sender:getCharacterSlot(id) or gScape.core.character.create({slot = id or 1})
-    print(string.format("var.sync Character %s received variable %s with value %s", id, idx, tostring(val)))
+    gScape.lib.log(color, string.format("var.sync Character %s received variable %s with value %s", id, idx, tostring(val)))
     -- Update the variable value
     character.vars[idx] = val
     -- Update the character client-side
@@ -45,13 +46,12 @@ local function receiveCharacterVarsSync()
 
     -- Check to see if the character table is valid and the ID is valid
     if (not tbl or not id) then
-        print(string.format("vars.sync Failed to receive character %s from %s", id, tostring(sender)))
+        gScape.lib.log(color, string.format("vars.sync Failed to receive character %s from %s", id, tostring(sender)))
         return
     end
 
     -- Print out to the console that the character table was received
-    print(string.format("vars.sync Received character %s from %s", id, tostring(sender)))
-    print("vars.sync Received character table:")
+    gScape.lib.log(color, string.format("vars.sync Received character %s from %s", id, tostring(sender)))
     PrintTable(tbl)
 
     -- Set the character table on the sender's character data
@@ -68,13 +68,12 @@ local function receiveCharacters()
     local sender = net.ReadEntity()
     local characters = net.ReadTable()
     
-    print("Received characters from " .. tostring(sender))
-    
     sender:setCharacters(characters or {}, LocalPlayer())
     
-    print("Characters received:")
-    for i, v in ipairs(characters) do
-        print("\t" .. v)
+    gScape.lib.log(color, "Characters received:")
+    for i, v in ipairs(LocalPlayer():getCharacters()) do
+        gScape.lib.log(color, "Character[" .. v:getSlot() .. "]:")
+        PrintTable{v}
     end
 end
 
