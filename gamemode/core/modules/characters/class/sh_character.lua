@@ -22,11 +22,13 @@ do
     ]==]
     function gScape.core.character.newVariable(data)
         local upperName, alias = string.upper(string.sub(data.name, 1, 1)) .. string.sub(data.name, 2), data.alias
-        local character = gScape.core.character.default
-        gScape.lib.log(color, "Creating new character variable: " .. data.name)
-        character.vars[data.name] = data.default
-        gScape.lib.log(color, "Setting default value of " .. data.name .. " to " .. tostring(data.default))
         gScape.core.character.vars[data.name] = data
+        
+        local character = gScape.core.character.default
+        character.vars[data.name] = data.default
+
+        gScape.lib.log(color, "Creating new character variable: " .. data.name)
+        gScape.lib.log(color, "Setting default value of " .. data.name .. " to " .. tostring(data.default))
 
         if data.onGet then
             character["get" .. upperName] = data.onGet
@@ -37,38 +39,36 @@ do
             end
         end
         
-        if SERVER then
-            if data.onSet then
-                character["set" .. upperName] = data.onSet
-            elseif data.noReplication then
-                character["set" .. upperName] = function(self, value)
-                    self.vars[data.name] = value
-                    gScape.lib.log(color, "Setting " .. data.name .. " to " .. value)
-                end
-            elseif data.isLocal then
-                character["set" .. upperName] = function(self, value, noReplication)
-                    self.vars[data.name] = value
-                    gScape.lib.log(color, "Setting " .. data.name .. " to " .. tostring(value))
-                    if noReplication then return end
-                    net.Start("netScape.character.var.sync")
-                        net.WriteEntity(self:getPlayer())
-                        net.WriteUInt(self:getSlot(), 8)
-                        net.WriteString(data.name)
-                        net.WriteType(value)
-                    net.Send(self:getPlayer())
-                end
-            else
-                character["set" .. upperName] = function(self, value, noReplication)
-                    self.vars[data.name] = value
-                    gScape.lib.log(color, "Setting " .. data.name .. " to " .. tostring(value))
-                    if noReplication then return end
-                    net.Start("netScape.character.var.sync")
-                        net.WriteEntity(self:getPlayer())
-                        net.WriteUInt(self:getSlot(), 8)
-                        net.WriteString(data.name)
-                        net.WriteType(value)
-                    net.Broadcast()
-                end
+        if data.onSet then
+            character["set" .. upperName] = data.onSet
+        elseif data.noReplication then
+            character["set" .. upperName] = function(self, value)
+                self.vars[data.name] = value
+                gScape.lib.log(color, "SV Setting " .. data.name .. " to " .. value)
+            end
+        elseif data.isLocal then
+            character["set" .. upperName] = function(self, value, noReplication)
+                self.vars[data.name] = value
+                gScape.lib.log(color, "LOCAL Setting " .. data.name .. " to " .. tostring(value))
+                if noReplication or !SERVER then return end
+                net.Start("netScape.character.var.sync")
+                    net.WriteEntity(self:getPlayer())
+                    net.WriteUInt(self:getSlot(), 8)
+                    net.WriteString(data.name)
+                    net.WriteType(value)
+                net.Send(self:getPlayer())
+            end
+        else
+            character["set" .. upperName] = function(self, value, noReplication)
+                self.vars[data.name] = value
+                gScape.lib.log(color, "GLOBAL Setting " .. data.name .. " to " .. tostring(value))
+                if noReplication or !SERVER then return end
+                net.Start("netScape.character.var.sync")
+                    net.WriteEntity(self:getPlayer())
+                    net.WriteUInt(self:getSlot(), 8)
+                    net.WriteString(data.name)
+                    net.WriteType(value)
+                net.Broadcast()
             end
         end
 
@@ -118,7 +118,7 @@ end
 do
     gScape.core.character.newVariable{
         name = "player",
-        default = nil,
+        default = false,
         alias = "ply",
     }
 

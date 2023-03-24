@@ -10,7 +10,7 @@ do
     gScape.config.character.startingCoins = 1000
     gScape.config.character.maxCharacters = 5
 
-    gScape.config.character.defaultModel = "models/player/p2_chell.mdl"
+    gScape.config.character.defaultModel = "models/error.mdl"
     gScape.config.character.defaultModels = {
         "models/player/alyx.mdl",
         "models/player/barney.mdl",

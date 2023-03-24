@@ -78,3 +78,4 @@ local function receiveCharacters()
 end
 
 net.Receive("netScape.characters.sync", receiveCharacters)
+
