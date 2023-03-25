@@ -1,11 +1,18 @@
 gScape.core = gScape.core or {}
-gScape.core.item = gScape.core.item or {}
-gScape.core.item.vars = gScape.core.item.vars or {}
+gScape.core.item = gScape.core.item or {} 
+gScape.core.item.vars = gScape.core.item.vars or {} -- var full data
+gScape.core.item.list = gScape.core.item.list or {} -- list of all items
 
-gScape.core.item.default = gScape.core.item.default or {}
-gScape.core.item.default.vars = gScape.core.item.default.vars or {}
+gScape.core.item.default = gScape.core.item.default or {} -- default item meta
+gScape.core.item.default.vars = gScape.core.item.default.vars or {} -- var meta data
 
 do
+    local item_idx = 0
+end
+
+do
+    
+
     function gScape.core.item.default.varSync(self, name, receiver)
         if SERVER then
             if IsValid(receiver) then
@@ -26,16 +33,17 @@ do
         end
     end
 
---[==[
-    @param data
-    @param data.name - The name of the property
-    @param data.default - The default value of the property
-    @param data.alias - The alias of the property, which is used in the replication system
-    @param data.onGet - A function that is called when the property is retrieved
-    @param data.onSet - A function that is called when the property is set
-    @param data.noReplication - A boolean indicating whether the property should be replicated or not
-    @param data.isLocal - A boolean indicating whether the property should be replicated to the owner only
-]==]
+    --[==[
+        @param data
+        @param data.name - The name of the property
+        @param data.default - The default value of the property
+        @param data.alias - The alias of the property, which is used in the replication system
+        @param data.onGet - A function that is called when the property is retrieved
+        @param data.onSet - A function that is called when the property is set
+            @param data.autoReplication - A boolean indicating whether the property should be replicated automatically or not
+        @param data.noReplication - A boolean indicating whether the property should be replicated or not
+        @param data.isLocal - A boolean indicating whether the property should be replicated to the owner only
+    ]==]
     function gScape.core.item.newVariable(data)
         local upperName, alias = string.upper(string.sub(data.name, 1, 1)) .. string.sub(data.name, 2), data.alias
         gScape.core.item.vars[data.name] = data
@@ -50,8 +58,14 @@ do
                 return self.vars[data.name]
             end
         end
-
         if data.onSet then
+            item["set" .. upperName] = data.onSet
+        elseif data.onSet and data.autoReplication then
+            local oldSet = data.onSet
+            data.onSet = function(self, value, receiver, noReplication, ...)
+                oldSet(self, value, ...)
+                if !noReplication then self:varSync(data.name, receiver) end
+            end
             item["set" .. upperName] = data.onSet
         elseif data.noReplication then
             item["set" .. upperName] = function(self, value)
@@ -84,10 +98,26 @@ do
 end
 
 do
+    
+end
+
+do
     gScape.core.item.newVariable{
         name = "name",
         default = "Base Item",
         alias = "nick",
+    }
+
+    gScape.core.item.newVariable{
+        name = "id",
+        default = 0,
+        alias = "identifier",
+    }
+
+    gScape.core.item.newVariable{
+        name = "class",
+        default = false,
+        alias = "type",
     }
 
     gScape.core.item.newVariable{
@@ -100,12 +130,6 @@ do
         name = "model",
         default = "models/error.mdl",
         alias = "mdl",
-    }
-
-    gScape.core.item.newVariable{
-        name = "id",
-        default = 0,
-        alias = "identifier",
     }
     
     gScape.core.item.newVariable{
