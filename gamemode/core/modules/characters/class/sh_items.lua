@@ -1,19 +1,14 @@
-gScape.core = gScape.core or {}
-gScape.core.item = gScape.core.item or {} 
-gScape.core.item.vars = gScape.core.item.vars or {} -- var full data
-gScape.core.item.list = gScape.core.item.list or {} -- list of all items
+local ext = gScape.extentions.new"core.item"
 
-gScape.core.item.default = gScape.core.item.default or {} -- default item meta
-gScape.core.item.default.vars = gScape.core.item.default.vars or {} -- var meta data
+ext.vars = ext.vars or {} -- var full data
+ext.list = ext.list or {} -- list of all items
 
-do
-    local item_idx = 0
-end
+ext.default = ext.default or {} -- default item meta
+ext.default.vars = ext.default.vars or {} -- var meta data
+
 
 do
-    
-
-    function gScape.core.item.default.varSync(self, name, receiver)
+    function ext.default.varSync(self, name, receiver)
         if SERVER then
             if IsValid(receiver) then
                 net.Start("netScape.item.var.sync")
@@ -33,6 +28,7 @@ do
         end
     end
 
+
     --[==[
         @param data
         @param data.name - The name of the property
@@ -44,11 +40,11 @@ do
         @param data.noReplication - A boolean indicating whether the property should be replicated or not
         @param data.isLocal - A boolean indicating whether the property should be replicated to the owner only
     ]==]
-    function gScape.core.item.newVariable(data)
+    function ext.newVariable(data)
         local upperName, alias = string.upper(string.sub(data.name, 1, 1)) .. string.sub(data.name, 2), data.alias
-        gScape.core.item.vars[data.name] = data
+        ext.vars[data.name] = data
         
-        local item = gScape.core.item.default 
+        local item = ext.default 
         item.vars[data.name] = data.default
 
         if data.onGet then
@@ -93,7 +89,7 @@ do
             item["set" .. string.upper(string.sub(alias, 1, 1)) .. string.sub(alias, 2)] = item["set" .. upperName]
         end
 
-        gScape.core.item.default = item
+        ext.default = item
     end
 end
 
@@ -102,64 +98,63 @@ do
 end
 
 do
-    gScape.core.item.newVariable{
+    ext.newVariable{
         name = "name",
         default = "Base Item",
         alias = "nick",
     }
 
-    gScape.core.item.newVariable{
+    ext.newVariable{
         name = "id",
         default = 0,
         alias = "identifier",
     }
 
-    gScape.core.item.newVariable{
+    ext.newVariable{
         name = "class",
         default = false,
         alias = "type",
     }
 
-    gScape.core.item.newVariable{
+    ext.newVariable{
         name = "description",
         default = "This is a base item.",
         alias = "desc",
     }
 
-    gScape.core.item.newVariable{
+    ext.newVariable{
         name = "model",
         default = "models/error.mdl",
         alias = "mdl",
     }
     
-    gScape.core.item.newVariable{
+    ext.newVariable{
         name = "player",
         default = false,
         alias = "owner",
     }
     
-    gScape.core.item.newVariable{
+    ext.newVariable{
         name = "inventory",
         default = false,
         alias = "inv",
     }
 
-    gScape.core.item.newVariable{
+    ext.newVariable{
         name = "slot",
         default = 0,
         alias = "position",
     }
 
-    gScape.core.item.newVariable{
+    ext.newVariable{
         name = "amount",
         default = 1,
         alias = "count",
     }
 
-    gScape.core.item.newVariable{
+    ext.newVariable{
         name = "stackable",
         default = false,
     }
-    
 end
 

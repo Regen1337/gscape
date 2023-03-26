@@ -7,6 +7,10 @@ gScape.lib = gScape.lib or {}
     @param: mt - metatable to inherit from
     @return: table with metatable
 ]==]
-function gScape.lib.inherit( t, mt )
-    return setmetatable( t or {}, {__index = mt, __call = mt} )
+function gScape.lib.inherit( t, mt, oMethods )
+    if oMethods then
+        return setmetatable( t or {}, mt )
+    else
+        return setmetatable( t or {}, {__index = mt, __call = mt} )
+    end
 end
