@@ -6,7 +6,7 @@ gScape.__extBase = gScape.__extBase or {}
 
 do
     local base = gScape.__extBase
-    local meta = {__index = gScape.__extBase, __tostring = function(o) return String.format("gScape_ext: [%s]", o:getTag()) end}
+    local meta = {__index = gScape.__extBase, __tostring = function(o) return string.format("gScape_ext: [%s]", o:getTag()) end}
 
     do -- base extention
         function base:getTag()
@@ -36,20 +36,20 @@ do
         end
 
         function base:getName()
-            return self.name
+            return self.__name
         end
 
         function base:setName(name)
-            self.name = tostring(name)
+            self.__name = tostring(name)
             self:setTag()
         end
 
         gScape.__extBase = base
     end
 
-    do  
+    do
         function gScape.extentions.new(name)
-            local o = setmetatable({name = tostring(name)}, meta)
+            local o = setmetatable({__name = tostring(name)}, meta)
 
             if gScape.__ext[name] then
                 gScape.lib.log(color_white, "gScape.__ext[" .. name .. "] is being overwritten")    

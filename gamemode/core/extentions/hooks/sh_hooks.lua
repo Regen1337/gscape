@@ -6,7 +6,7 @@ local _hooks = hook.Hooks
     This is done by checking the upvalues of the hook.GetTable function.
 ]==]
 do
-    if not _hooks then for i = 1, 5 do
+    if not _hooks then for i = 1, 100 do
         local name, value = debug.getupvalue(hook.GetTable, i)
         if name == "Hooks" then _hooks = value break end
     end end
@@ -25,6 +25,8 @@ function hook.GetTable() return _hooks end
     @param func The hook function.
 ]==]
 function hook.Add(event, name, func)
+    if isentity(name) then return end
+    
     if not isstring(event) then error("bad argument #1 to 'hook.Add' (string expected, got " .. type(event) .. ")", 0) end
     if not isstring(name) then error("bad argument #2 to 'hook.Add' (string expected, got " .. type(name) .. ")", 0) end
     if not isfunction(func) then error("bad argument #3 to 'hook.Add' (function expected, got " .. type(func) .. ")", 0) end
@@ -100,7 +102,3 @@ end
 function hook.Run(event, ...)
     return hook.Call(event, GAMEMODE or GM, ...)
 end
-
-
-
-
