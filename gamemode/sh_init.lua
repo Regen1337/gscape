@@ -17,7 +17,7 @@ GM.Credits = [==[
 
 ]==]
 
-gScape = {}
+gScape = gScape or {}
 
 gScape.core = {} -- core files
 gScape.config = {} -- config files

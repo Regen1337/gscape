@@ -1,3 +1,4 @@
+print("Loading hook library...")
 // This code is used to retrieve the hook table, and sets it to the local variable "_hooks"
 local _hooks = hook.Hooks
 
@@ -6,7 +7,8 @@ local _hooks = hook.Hooks
     This is done by checking the upvalues of the hook.GetTable function.
 ]==]
 do
-    if not _hooks then for i = 1, 100 do
+    if not _hooks then for i = 1, 5 do
+        print("Checking upvalue " .. tostring(i))
         local name, value = debug.getupvalue(hook.GetTable, i)
         if name == "Hooks" then _hooks = value break end
     end end
@@ -47,6 +49,12 @@ function hook.Remove(event, name)
     if _hooks[event] then _hooks[event][name] = nil end
 end
 
+--[==[
+    This function is used to call a event, overriding the default hook.Call function to allow for custom hooks; used internally by hook.Run
+    @param event The name of the event.
+    @param gm The gamemode table.
+    @param ... The arguments to pass to the event.
+]==]
 function hook.Call(event, gm, ...)
     if not isstring(event) then error("bad argument #1 to 'hook.Call' (string expected, got " .. type(event) .. ")", 0) end
     

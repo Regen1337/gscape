@@ -1,11 +1,12 @@
 gScape = gScape or {}
 gScape.config = gScape.config or {}
-gScape.core = gScape.core or {}
-gScape.core.character = gScape.core.character or {}
-gScape.core.character.vars = gScape.core.character.vars or {}
-gScape.core.character.default  = gScape.core.character.default or {}
-gScape.core.character.default.vars = gScape.core.character.default.vars or{}
+
 local color = Color(100, 255, 170)
+local ext = gScape.extentions.new("core.character")
+
+ext.vars = ext.vars or {}
+ext.default  = ext.default or {}
+ext.default.vars = ext.default.vars or{}
 
 do
     --[==[
@@ -20,11 +21,11 @@ do
     @param: data.isLocal - Whether or not to replicate the variable locally
     @return: void
     ]==]
-    function gScape.core.character.newVariable(data)
+    function ext.newCharacterVar(data)
         local upperName, alias = string.upper(string.sub(data.name, 1, 1)) .. string.sub(data.name, 2), data.alias
-        gScape.core.character.vars[data.name] = data
+        ext.vars[data.name] = data
         
-        local character = gScape.core.character.default
+        local character = ext.default
         character.vars[data.name] = data.default
 
         gScape.lib.log(color, "Creating new character variable: " .. data.name)
@@ -51,7 +52,7 @@ do
                 self.vars[data.name] = value
                 gScape.lib.log(color, "LOCAL Setting " .. data.name .. " to " .. tostring(value))
                 if noReplication or !SERVER then return end
-                net.Start("netScape.character.var.sync")
+                net.Start(char_ext:getTag() .. ".var.sync")
                     net.WriteEntity(self:getPlayer())
                     net.WriteUInt(self:getSlot(), 8)
                     net.WriteString(data.name)
@@ -63,7 +64,7 @@ do
                 self.vars[data.name] = value
                 gScape.lib.log(color, "GLOBAL Setting " .. data.name .. " to " .. tostring(value))
                 if noReplication or !SERVER then return end
-                net.Start("netScape.character.var.sync")
+                net.Start(char_ext:getTag() .. ".var.sync")
                     net.WriteEntity(self:getPlayer())
                     net.WriteUInt(self:getSlot(), 8)
                     net.WriteString(data.name)
@@ -82,7 +83,7 @@ do
             character["set" .. string.upper(string.sub(alias, 1, 1)) .. string.sub(alias, 2)] = character["set" .. upperName]
         end
 
-        gScape.core.character.default = character
+        ext.default = character
     end
 
     --[==[
@@ -99,8 +100,8 @@ do
     @param: data.xp - The xp of the character
     @return: void
     ]==]
-    function gScape.core.character.create(data)
-        local char = gScape.lib.inherit({vars = {}}, gScape.core.character.default)
+    function ext.newCharacter(data)
+        local char = gScape.lib.inherit({vars = {}}, ext.default)
 
         if data then
             for i,v in next, data do
@@ -116,48 +117,48 @@ do
 end
 
 do
-    gScape.core.character.newVariable{
+    ext.newCharacterVar{
         name = "player",
         default = false,
         alias = "ply",
     }
 
-    gScape.core.character.newVariable{
+    ext.newCharacterVar{
         name = "slot",
         default = 1,
     }
 
-    gScape.core.character.newVariable{
+    ext.newCharacterVar{
         name = "mode",
         default = 1,
     }
 
-    gScape.core.character.newVariable{
+    ext.newCharacterVar{
         name = "name",
         default = "nil",
     }
 
-    gScape.core.character.newVariable{
+    ext.newCharacterVar{
         name = "model",
         default = gScape.config.character.defaultModel,
     }
 
-    gScape.core.character.newVariable{
+    ext.newCharacterVar{
         name = "inventory",
         default = {},
     }
 
-    gScape.core.character.newVariable{
+    ext.newCharacterVar{
         name = "skills",
         default = {},
     }
 
-    gScape.core.character.newVariable{
+    ext.newCharacterVar{
         name = "level",
         default = 1,
     }
 
-    gScape.core.character.newVariable{
+    ext.newCharacterVar{
         name = "xp",
         default = 0,
     }

@@ -1,4 +1,5 @@
 local color = Color(255, 100, 100)
+local char_ext = gScape.extentions.get("core.character")
 --[==[
     @param sender The entity who send the data
     @param id The character ID
@@ -6,7 +7,7 @@ local color = Color(255, 100, 100)
     @param val The value of the variable
 ]==]
 -- Receive a character update from the server and update the local character with the new data
-net.Receive("netScape.character.var.sync", function()
+net.Receive(char_ext:getTag() .. ".var.sync", function()
     -- Get the sender of the message
     local sender = net.ReadEntity()
     -- Get the character slot of the character
@@ -18,7 +19,7 @@ net.Receive("netScape.character.var.sync", function()
     gScape.lib.log(color, string.format("var.sync Received character %s from %s", id, tostring(sender)))
 
     -- Create a new character if it doesn't exist or get the existing character
-    local character = sender:getCharacterSlot(id) or gScape.core.character.create({slot = id or 1})
+    local character = sender:getCharacterSlot(id) or char_ext.newCharacter({slot = id or 1})
     gScape.lib.log(color, string.format("var.sync Character %s received variable %s with value %s", id, idx, tostring(val)))
     -- Update the variable value
     character.vars[idx] = val
@@ -58,7 +59,7 @@ local function receiveCharacterVarsSync()
     sender:setCharacter(tbl, LocalPlayer())
 end
 
-net.Receive("netScape.character.vars.sync", receiveCharacterVarsSync)
+net.Receive(char_ext:getTag() .. ".vars.sync", receiveCharacterVarsSync)
 
 --[==[
     @param sender The entity who send the data
@@ -77,5 +78,5 @@ local function receiveCharacters()
     end
 end
 
-net.Receive("netScape.characters.sync", receiveCharacters)
+net.Receive(char_ext:getTag() .. "s.vars.sync", receiveCharacters)
 

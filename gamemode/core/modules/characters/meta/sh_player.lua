@@ -4,8 +4,9 @@ local color = Color(255, 100, 100)
 do -- player meta
     -- only send all characters to the owner of the character; TODO
     function PLAYER:setCharacter(data, receiver)
+        local char_ext = gScape.extentions.get("core.character")
         -- Create a new character based on the data passed to this function
-        local character = gScape.core.character.create(data or {})
+        local character = char_ext.newCharacter(data or {})
         -- Set the player of the character to this player with noReplication set to true
         character:setPlayer(self, true)
         -- Set the current character to this one
@@ -43,7 +44,7 @@ do -- player meta
         local characters = {}
         -- Loop through the data and create a new character for each one
         for k, v in pairs(data) do
-            local character = gScape.core.character.create(v.vars or {})
+            local character = char_ext.newCharacter(v.vars or {})
             character:setPlayer(self, true)
             characters[k] = character
         end
@@ -80,7 +81,7 @@ do -- player meta
             -- loop through all characters and remove any variables marked as "noReplication"
             for k, v in ipairs(characters) do
                 for k2, v2 in next, (v.vars) do
-                    if gScape.core.character.vars[k2] and gScape.core.character.vars[k2].noReplication then
+                    if char_ext.vars[k2] and char_ext.vars[k2].noReplication then
                         characters[k].vars[k2] = nil
                     end
                 end
@@ -88,7 +89,7 @@ do -- player meta
 
             -- send to the player
             gScape.lib.log(color, "Sending characters to "..self:Nick())
-            net.Start("netScape.characters.sync")
+            net.Start(char_ext:getTag() .. "s.vars.sync")
                 net.WriteEntity(self)
                 net.WriteTable(characters)
             net.Send(self)
@@ -96,7 +97,7 @@ do -- player meta
             -- loop through all characters and remove any variables marked as "noReplication" or "isLocal"
             for k, v in ipairs(characters) do
                 for k2, v2 in next, (v.vars) do
-                    if gScape.core.character.vars[k2] and (gScape.core.character.vars[k2].noReplication or gScape.core.character.vars[k2].isLocal) then
+                    if char_ext.vars[k2] and (char_ext.vars[k2].noReplication or char_ext.vars[k2].isLocal) then
                         characters[k].vars[k2] = nil
                     end
                 end
@@ -104,7 +105,7 @@ do -- player meta
 
             -- send to the player
             gScape.lib.log(color, "Sending characters to "..receiver:Nick())
-            net.Start("netScape.characters.sync")
+            net.Start(char_ext:getTag() .. "s.vars.sync")
                 net.WriteEntity(self)
                 net.WriteTable(characters)
             net.Send(receiver)

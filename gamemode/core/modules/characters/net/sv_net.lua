@@ -1,7 +1,10 @@
-util.AddNetworkString("netScape.characters.sync")
-util.AddNetworkString("netScape.character.vars.sync")
-util.AddNetworkString("netScape.character.var.sync")
+local char_ext = gScape.extentions.get("core.character")
+local item_ext = gScape.extentions.get("core.item")
+
+util.AddNetworkString(char_ext:getTag() .. "s.vars.sync")
+util.AddNetworkString(char_ext:getTag() .. ".vars.sync")
+util.AddNetworkString(char_ext:getTag() .. ".var.sync")
 
 -- items sync
-util.AddNetworkString("netScape.item.vars.sync")
-util.AddNetworkString("netScape.item.var.sync")
+util.AddNetworkString(item_ext:getTag() .. ".vars.sync")
+util.AddNetworkString(item_ext:getTag() .. ".var.sync")

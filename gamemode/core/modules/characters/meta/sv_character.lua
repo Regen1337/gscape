@@ -1,4 +1,5 @@
-local character = gScape.core.character.default or {}
+local char_ext = gScape.extentions.get("core.character")
+local character = char_ext.default or {}
 local color = Color(255, 100, 100)
 
 do -- character meta
@@ -11,12 +12,12 @@ do -- character meta
         elseif receiver == self:getPlayer() then
             local data = {}
             for i, v in next, (self.vars) do
-                if gScape.core.character.vars[i] and !gScape.core.character.vars[i].noReplication then
+                if char_ext.vars[i] and !char_ext.vars[i].noReplication then
                     data[i] = v
                 end
             end
             gScape.lib.log(color, "Sending character data to player " .. receiver:Nick() .. "...")
-            net.Start("netScape.character.vars.sync")
+            net.Start(char_ext:getTag() .. ".vars.sync")
                 net.WriteEntity(self:getPlayer())
                 net.WriteUInt(self:getSlot(), 8)
                 net.WriteTable(data)
@@ -24,12 +25,12 @@ do -- character meta
         elseif receiver:IsPlayer() then
             local data = {}
             for i, v in next, (self.vars) do
-                if gScape.core.character.vars[i] and !gScape.core.character.vars[i].isLocal and !gScape.core.character.vars[i].noReplication then
+                if char_ext.vars[i] and !char_ext.vars[i].isLocal and !char_ext.vars[i].noReplication then
                     data[i] = v
                 end
             end
             gScape.lib.log(color, "Sending character data to player " .. receiver:Nick() .. "...")
-            net.Start("netScape.character.vars.sync")
+            net.Start(char_ext:getTag() .. ".vars.sync")
                 net.WriteEntity(self:getPlayer())
                 net.WriteUInt(self:getSlot(), 8)
                 net.WriteTable(data)
@@ -38,4 +39,4 @@ do -- character meta
     end
 end
 
-gScape.core.character.default = character
+gScape.extentions.update("core.character", character)

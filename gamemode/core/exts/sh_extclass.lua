@@ -1,3 +1,4 @@
+print("gScape: Loading Extention Base")
 gScape = gScape or {}
 
 gScape.extentions = gScape.extentions or {}
@@ -62,19 +63,33 @@ do
             return o
         end
 
-        function gScape.extentions.extend(name)
-            if gScape.__ext[name] then return gScape.__ext[name] else
+        function gScape.extentions.update(name, ext)
+            local o = gScape.__ext[name]
+
+            if o then
+                gScape.lib.log(color_white, "gScape.__ext[" .. name .. "] is being updated")
+                for k, v in pairs(ext) do
+                    o[k] = v
+                end
+            else
+                error("gScape.__ext[" .. name .. "] does not exist")
+            end
+
+            return o
+        end
+
+        function gScape.extentions.newInterface(name)
+            return setmetatable({}, {__index = function(t, k) return gScape.__ext[name][k] end, __tostring = function(o) return String.format("gScape_ext: [%s] [INSTANCE]", o:getTag()) end, _mt = gScape.__ext[name]})
+        end
+
+        function gScape.extentions.get(name)
+            if gScape.__ext[name] then 
+                return gScape.__ext[name] 
+            else
                 error("gScape.__ext[" .. name .. "] does not exist")
             end
         end
 
-        function gScape.extentions.newInterface(name)
-            return setmetatable({}, {__index = function(_, k) return gScape.__ext[name][k] end, __tostring = function(o) return String.format("gScape_ext: [%s] [INSTANCE]", o:getTag()) end, _mt = gScape.__ext[name]})
-        end
-
-        function gScape.extentions.get(name)
-            return gScape.__ext[name]
-        end
     end
 
 end
